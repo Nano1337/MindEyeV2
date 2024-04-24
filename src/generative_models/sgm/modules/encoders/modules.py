@@ -638,7 +638,9 @@ class FrozenOpenCLIPImageEmbedder(AbstractEmbModel):
         )
         x = (x + 1.0) / 2.0
         # renormalize according to clip
+        x = x.permute(2, 0, 1)
         x = kornia.enhance.normalize(x, self.mean, self.std)
+        # print("PASSED!!")
         return x
 
     def freeze(self):
@@ -715,6 +717,9 @@ class FrozenOpenCLIPImageEmbedder(AbstractEmbModel):
             tokens = None
         else:
             assert self.model.visual.output_tokens
+            img = img.permute(1, 2, 0)
+            # print(f"img shape: {img.shape}")
+            img = img.unsqueeze(0)
             x, tokens = self.model.visual(img)
             if self.l2_norm_tokens:
                 token_shape = tokens.shape
